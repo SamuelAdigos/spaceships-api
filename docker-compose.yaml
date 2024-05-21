@@ -1,0 +1,24 @@
+version: '3'
+services:
+  # Service for the API
+  spaceships-api:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+    networks:
+      - mynetwork
+
+  # Service for the RabbitMQ
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - mynetwork
+
+# Network for the services
+networks:
+  mynetwork:
