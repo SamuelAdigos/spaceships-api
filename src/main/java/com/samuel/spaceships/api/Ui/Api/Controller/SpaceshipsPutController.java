@@ -1,12 +1,16 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
 import com.samuel.spaceships.api.Application.Update.UpdateSpaceshipCommand;
-import com.samuel.spaceships.api.Application.Update.UpdateSpaceshipCommandHandler;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandBus;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandNotRegisteredError;
+import com.samuel.spaceships.api.Domain.Bus.Query.QueryBus;
+import com.samuel.spaceships.api.Domain.DomainError;
+import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipNotExist;
+import com.samuel.spaceships.api.Infrastructure.Spring.ApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.io.Serializable;
 import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +21,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SpaceshipsPutController {
-  private final UpdateSpaceshipCommandHandler commandHandler;
+public class SpaceshipsPutController extends ApiController {
 
-  public SpaceshipsPutController(UpdateSpaceshipCommandHandler commandHandler) {
-    this.commandHandler = commandHandler;
+  public SpaceshipsPutController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
+  }
+
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return new HashMap<>() {
+      {
+        put(SpaceshipNotExist.class, HttpStatus.NOT_FOUND);
+      }
+    };
   }
 
   @Operation(summary = "Update an existing spaceship")
@@ -33,13 +45,12 @@ public class SpaceshipsPutController {
   })
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @PutMapping(value = "/spaceships/{id}")
-  public ResponseEntity<HashMap<String, Serializable>> update(
-    @PathVariable Long id,
-    @RequestBody SpaceshipsPutControllerRequestBody body
-  ) {
-    var command = new UpdateSpaceshipCommand(id, body.name(), body.franchise(), body.maxSpeed());
-    commandHandler.execute(command);
+  public ResponseEntity<String> index(
+    @PathVariable String id,
+    @RequestBody SpaceshipsDetailsRequestBody request
+  ) throws CommandNotRegisteredError {
+    dispatch(new UpdateSpaceshipCommand(id, request.getName(), request.getFranchise(), request.getMaxSpeed()));
 
-    return ResponseEntity.status(HttpStatus.OK).body(new HashMap<>());
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }
