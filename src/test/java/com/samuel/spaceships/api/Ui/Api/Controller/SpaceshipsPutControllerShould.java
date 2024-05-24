@@ -1,50 +1,38 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
-import com.samuel.spaceships.api.Application.Update.UpdateSpaceshipCommand;
-import com.samuel.spaceships.api.Application.Update.UpdateSpaceshipCommandHandler;
+import com.samuel.spaceships.api.Domain.Spaceship.Repository.SpaceshipRepository;
+import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
+import com.samuel.spaceships.api.Ui.Api.Controller.common.BaseControllerTest;
+import com.samuel.spaceships.api.Ui.Api.Controller.common.TestDataUtil;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.when;
 
 public class SpaceshipsPutControllerShould extends BaseControllerTest {
 
   @MockBean
-  private UpdateSpaceshipCommandHandler commandHandler;
+  private SpaceshipRepository spaceshipRepository;
 
   @Test
-  public void update_a_spaceship() throws Exception {
-    Mockito.doNothing().when(commandHandler).execute(any(UpdateSpaceshipCommand.class));
+  @WithMockUser(roles = "ADMIN")
+  void update_a_existing_spaceship_with_user_with_permissions() throws Exception {
+    final String UUID = "123e4567-e89b-12d3-a456-426614174000";
+    givenUpdateDataBehaviourMocked(UUID);
 
-    String requestBody = """
-                {
-                    "name": "USS Enterprise",
-                    "franchise": "Star Trek",
-                    "maxSpeed": 9.975
-                }
-                """;
+    assertRequestWithBody(
+        "PUT",
+        String.format("/spaceships/%s", UUID),
+        "{\"name\": \"Change name\", \"franchise\": \"Star Trek\", \"maxSpeed\": 9.975}",
+        200
+    );
+  }
 
-    mockMvc.perform(put("/spaceships/1")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(requestBody))
-        .andExpect(status().isOk())
-        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-        .andExpect(content().json("{}"));
-
-    ArgumentCaptor<UpdateSpaceshipCommand> commandCaptor = ArgumentCaptor.forClass(UpdateSpaceshipCommand.class);
-    Mockito.verify(commandHandler).execute(commandCaptor.capture());
-    UpdateSpaceshipCommand capturedCommand = commandCaptor.getValue();
-
-    assertThat(capturedCommand.id()).isEqualTo(1L);
-    assertThat(capturedCommand.name()).isEqualTo("USS Enterprise");
-    assertThat(capturedCommand.franchise()).isEqualTo("Star Trek");
-    assertThat(capturedCommand.maxSpeed()).isEqualTo(9.975);
+  private void givenUpdateDataBehaviourMocked(String uuid) throws Exception {
+    Spaceship spaceship = TestDataUtil.getSpaceshipById(uuid);
+    when(spaceshipRepository.existsById(any())).thenReturn(true);
+    when(spaceshipRepository.save(any())).thenReturn(spaceship);
   }
 }
