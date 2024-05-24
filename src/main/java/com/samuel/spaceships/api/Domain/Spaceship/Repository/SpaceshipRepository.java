@@ -12,8 +12,6 @@ public interface SpaceshipRepository {
 
   Optional<Spaceship> findById(SpaceshipId id);
 
-  Long findMaxId();
-
   Page<Spaceship> findAll(Pageable pageable);
 
   Page<Spaceship> findByNameContaining(String name, Pageable pageable);

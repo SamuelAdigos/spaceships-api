@@ -10,35 +10,35 @@ public class Spaceship extends AggregateRoot {
   private final SpaceshipFranchise franchise;
   private final SpaceshipSpeed maxSpeed;
 
-  public Spaceship(Long id, String name, String franchise, double maxSpeed) {
-    this.id = new SpaceshipId(id);
-    this.name = new SpaceshipName(name);
-    this.franchise = new SpaceshipFranchise(franchise);
-    this.maxSpeed = new SpaceshipSpeed(maxSpeed);
+  public Spaceship(SpaceshipId id, SpaceshipName name, SpaceshipFranchise franchise, SpaceshipSpeed maxSpeed) {
+    this.id = id;
+    this.name = name;
+    this.franchise = franchise;
+    this.maxSpeed = maxSpeed;
   }
 
-  public static Spaceship create(Long id, String name, String franchise, double maxSpeed) {
+  public static Spaceship create(SpaceshipId id, SpaceshipName name, SpaceshipFranchise franchise, SpaceshipSpeed maxSpeed) {
     Spaceship spaceship = new Spaceship(id, name, franchise, maxSpeed);
 
-    spaceship.record(new SpaceshipCreatedDomainEvent(id, name, franchise));
+    spaceship.record(new SpaceshipCreatedDomainEvent(id.value(), name.value(), franchise.value(), maxSpeed.value()));
 
     return spaceship;
   }
 
-  public Long id() {
-    return id.value();
+  public SpaceshipId id() {
+    return id;
   }
 
-  public String name() {
-    return name.value();
+  public SpaceshipName name() {
+    return name;
   }
 
-  public String franchise() {
-    return franchise.value();
+  public SpaceshipFranchise franchise() {
+    return franchise;
   }
 
-  public double maxSpeed() {
-    return maxSpeed.value();
+  public SpaceshipSpeed maxSpeed() {
+    return maxSpeed;
   }
 
   @Override
