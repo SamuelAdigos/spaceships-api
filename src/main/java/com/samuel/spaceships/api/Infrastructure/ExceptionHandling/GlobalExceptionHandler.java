@@ -1,6 +1,7 @@
 package com.samuel.spaceships.api.Infrastructure.ExceptionHandling;
 
 import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipNotExist;
+import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipWithInvalidUuidFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,9 +17,12 @@ public class GlobalExceptionHandler {
     return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
   }
 
-  @ExceptionHandler(Exception.class)
-  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public ResponseEntity<String> handleGeneralException(Exception ex) {
-    return new ResponseEntity<>("An internal server error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+  @ExceptionHandler(SpaceshipWithInvalidUuidFormat.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public ResponseEntity<String> handleSpaceshipWithInvalidUuidFormat(
+      SpaceshipWithInvalidUuidFormat ex) {
+    return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
   }
+
+
 }
