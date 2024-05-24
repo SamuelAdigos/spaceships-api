@@ -1,4 +1,4 @@
-package com.samuel.spaceships.api.Infrastructure.Persistence;
+package com.samuel.spaceships.api.Infrastructure.Persistence.Mongo;
 
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
@@ -15,8 +15,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class H2SpaceshipRepository implements SpaceshipRepository {
-  private final SpaceshipJpaRepository repository;
+public class MongoSpaceshipRepository implements SpaceshipRepository {
+  private final BaseSpaceshipMongoRepository repository;
   private final SpaceshipMapper mapper;
 
   @Override
@@ -34,11 +34,6 @@ public class H2SpaceshipRepository implements SpaceshipRepository {
   @Override
   public Page<Spaceship> findAll(Pageable pageable) {
     return repository.findAll(pageable).map(mapper::toEntity);
-  }
-
-  @Override
-  public Long findMaxId() {
-    return repository.findMaxId();
   }
 
   @Override
