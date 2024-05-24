@@ -1,6 +1,6 @@
 package com.samuel.spaceships.api.Application.Delete;
 
-import com.samuel.spaceships.api.Application.CommandHandler;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandHandler;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DeleteSpaceshipCommandHandler extends
-    CommandHandler<DeleteSpaceshipCommand, Void> {
+    CommandHandler<DeleteSpaceshipCommand> {
 
   private final SpaceshipDeleter spaceshipDeleter;
   private static final Logger logger = LoggerFactory.getLogger(DeleteSpaceshipCommandHandler.class);
@@ -21,7 +21,7 @@ public class DeleteSpaceshipCommandHandler extends
   }
 
   @Override
-  protected Void run(DeleteSpaceshipCommand command) {
-    return spaceshipDeleter.delete(command.id());
+  protected void run(DeleteSpaceshipCommand command) {
+    spaceshipDeleter.delete(command.id());
   }
 }
