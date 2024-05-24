@@ -1,87 +1,83 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
-import com.samuel.spaceships.api.Application.Get.*;
+import com.samuel.spaceships.api.Application.Get.SpaceshipGetter;
+import com.samuel.spaceships.api.Application.SpaceshipResponse;
+import com.samuel.spaceships.api.Application.SpaceshipsPageResponse;
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
-import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipMother;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipDto;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipMapper;
+import com.samuel.spaceships.api.Ui.Api.Controller.common.BaseControllerTest;
+import com.samuel.spaceships.api.Ui.Api.Controller.common.TestDataUtil;
+import java.util.List;
+import lombok.val;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.http.MediaType;
-
-import java.util.Collections;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 public class SpaceshipsGetControllerShould extends BaseControllerTest {
 
   @MockBean
-  private GetAllSpaceshipsCommandHandler getAllSpaceshipsCommandHandler;
-
-  @MockBean
-  private GetSpaceshipByIdCommandHandler getSpaceshipByIdCommandHandler;
-
-  @MockBean
-  private GetSpaceshipsByNameCommandHandler getSpaceshipsByNameCommandHandler;
-
-  @MockBean
-  private SpaceshipMapper spaceshipMapper;
-
-  @MockBean
-  private PagedResourcesAssembler<SpaceshipDto> pagedResourcesAssembler;
+  SpaceshipGetter spaceshipGetter;
 
   @Test
-  public void get_all_spaceships() throws Exception {
-    Pageable pageable = PageRequest.of(0, 10);
-    Spaceship spaceship = SpaceshipMother.withDefaults();
-    PageImpl<Spaceship> spaceshipPage = new PageImpl<>(Collections.singletonList(spaceship), pageable, 1);
-    SpaceshipDto spaceshipDto = new SpaceshipDto(spaceship.id(), spaceship.name(), spaceship.franchise(), spaceship.maxSpeed());
+  @WithMockUser(roles = "USER")
+  public void shouldReturnAllSpaceships() throws Exception {
+    List<Spaceship> spaceshipList = TestDataUtil.getSpaceships();
+    mockSpaceshipsData(spaceshipList);
 
-    Mockito.when(getAllSpaceshipsCommandHandler.execute(any(GetAllSpaceshipsCommand.class)))
-        .thenReturn(spaceshipPage);
-    Mockito.when(spaceshipMapper.toDto(any(Spaceship.class)))
-        .thenReturn(spaceshipDto);
-
-    mockMvc.perform(get("/spaceships").contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
+    assertResponse(
+        "/spaceships",
+        200,
+        getExpectedResponse(
+            "SpaceshipsGetController/GetAllSpaceships/expected_response.json"));
   }
 
   @Test
-  public void get_spaceship_by_id() throws Exception {
-    Spaceship spaceship = SpaceshipMother.withDefaults();
-    SpaceshipDto spaceshipDto = new SpaceshipDto(spaceship.id(), spaceship.name(), spaceship.franchise(), spaceship.maxSpeed());
+  @WithMockUser(roles = "USER")
+  public void shouldReturnSpaceshipById() throws Exception {
+    val uuidToFind = "123e4567-e89b-12d3-a456-426614174000";
+    Spaceship spaceship = TestDataUtil.getSpaceshipById(uuidToFind);
+    mockSpaceshipByIdData(spaceship);
 
-    Mockito.when(getSpaceshipByIdCommandHandler.execute(any(GetSpaceshipByIdCommand.class)))
-        .thenReturn(spaceship);
-    Mockito.when(spaceshipMapper.toDto(any(Spaceship.class)))
-        .thenReturn(spaceshipDto);
-
-    mockMvc.perform(get("/spaceships/1").contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk())
-        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    assertResponse(
+        "/spaceships/" + uuidToFind,
+        200,
+        getExpectedResponse(
+            "SpaceshipsGetController/GetSpaceshipById/expected_response.json"));
   }
 
   @Test
-  public void get_spaceship_by_name() throws Exception {
-    Pageable pageable = PageRequest.of(0, 10);
-    Spaceship spaceship = SpaceshipMother.withDefaults();
-    PageImpl<Spaceship> spaceshipPage = new PageImpl<>(Collections.singletonList(spaceship), pageable, 1);
-    SpaceshipDto spaceshipDto = new SpaceshipDto(spaceship.id(), spaceship.name(), spaceship.franchise(), spaceship.maxSpeed());
+  @WithMockUser(roles = "USER")
+  public void shouldReturnSpaceshipByName() throws Exception {
+    val nameToFind = "star";
+    List<Spaceship> spaceshipList = TestDataUtil.getSpaceshipsByName(nameToFind);
+    mockSpaceshipByNameData(spaceshipList);
 
-    Mockito.when(getSpaceshipsByNameCommandHandler.execute(any(GetSpaceshipsByNameCommand.class)))
-        .thenReturn(spaceshipPage);
-    Mockito.when(spaceshipMapper.toDto(any(Spaceship.class)))
-        .thenReturn(spaceshipDto);
+    assertResponse(
+        "/spaceships?name=" + nameToFind,
+        200,
+        getExpectedResponse(
+            "SpaceshipsGetController/GetSpaceshipByName/expected_response.json"));
+  }
 
-    mockMvc.perform(get("/spaceships?name=test").contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isOk());
+  private void mockSpaceshipsData(List<Spaceship> spaceshipList) {
+    Page<Spaceship> spaceshipsPage = new PageImpl<>(spaceshipList);
+    SpaceshipsPageResponse response = SpaceshipsPageResponse.fromPage(spaceshipsPage);
+    when(spaceshipGetter.getAllSpaceships(any())).thenReturn(response);
+  }
+
+  private void mockSpaceshipByIdData(Spaceship spaceship) {
+    when(spaceshipGetter.getSpaceshipById(any())).thenReturn(
+        SpaceshipResponse.fromAggregate(spaceship));
+  }
+
+  private void mockSpaceshipByNameData(List<Spaceship> spaceshipList) {
+    Page<Spaceship> spaceshipsPage = new PageImpl<>(spaceshipList);
+    SpaceshipsPageResponse response = SpaceshipsPageResponse.fromPage(spaceshipsPage);
+    when(spaceshipGetter.getSpaceshipsByName(anyString(), any())).thenReturn(response);
   }
 }

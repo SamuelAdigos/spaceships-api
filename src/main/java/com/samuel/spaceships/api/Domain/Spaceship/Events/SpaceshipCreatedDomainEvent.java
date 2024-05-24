@@ -8,21 +8,24 @@ import java.util.Objects;
 public final class SpaceshipCreatedDomainEvent extends DomainEvent {
   private String name;
   private String franchise;
+  private double maxSpeed;
 
   public SpaceshipCreatedDomainEvent() {
     super(null);
   }
 
-  public SpaceshipCreatedDomainEvent(Long aggregateId, String name, String franchise) {
+  public SpaceshipCreatedDomainEvent(String aggregateId, String name, String franchise, double maxSpeed) {
     super(aggregateId);
     this.name = name;
     this.franchise = franchise;
+    this.maxSpeed = maxSpeed;
   }
 
-  public SpaceshipCreatedDomainEvent(Long aggregateId, String eventId, String occurredOn, String name, String franchise) {
+  public SpaceshipCreatedDomainEvent(String aggregateId, String eventId, String occurredOn, String name, String franchise, double maxSpeed) {
     super(aggregateId, eventId, occurredOn);
     this.name = name;
     this.franchise = franchise;
+    this.maxSpeed = maxSpeed;
   }
 
   @Override
@@ -39,8 +42,8 @@ public final class SpaceshipCreatedDomainEvent extends DomainEvent {
   }
 
   @Override
-  public SpaceshipCreatedDomainEvent fromPrimitives(Long aggregateId, HashMap<String, Serializable> body, String eventId, String occurredOn) {
-    return new SpaceshipCreatedDomainEvent(aggregateId, eventId, occurredOn, (String) body.get("name"), (String) body.get("franchise"));
+  public SpaceshipCreatedDomainEvent fromPrimitives(String aggregateId, HashMap<String, Serializable> body, String eventId, String occurredOn) {
+    return new SpaceshipCreatedDomainEvent(aggregateId, eventId, occurredOn, (String) body.get("name"), (String) body.get("franchise"), (double) body.get("maxSpeed"));
   }
 
   public String getName() {

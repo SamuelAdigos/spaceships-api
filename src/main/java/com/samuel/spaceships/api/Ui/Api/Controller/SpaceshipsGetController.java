@@ -1,26 +1,25 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
-import com.samuel.spaceships.api.Application.Get.GetAllSpaceshipsCommand;
-import com.samuel.spaceships.api.Application.Get.GetAllSpaceshipsCommandHandler;
-import com.samuel.spaceships.api.Application.Get.GetSpaceshipByIdCommand;
-import com.samuel.spaceships.api.Application.Get.GetSpaceshipByIdCommandHandler;
-import com.samuel.spaceships.api.Application.Get.GetSpaceshipsByNameCommand;
-import com.samuel.spaceships.api.Application.Get.GetSpaceshipsByNameCommandHandler;
-import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipDto;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipMapper;
+import com.samuel.spaceships.api.Application.Get.GetAllSpaceshipsQuery;
+import com.samuel.spaceships.api.Application.Get.GetSpaceshipByIdQuery;
+import com.samuel.spaceships.api.Application.Get.GetSpaceshipsByNameQuery;
+import com.samuel.spaceships.api.Application.SpaceshipResponse;
+import com.samuel.spaceships.api.Application.SpaceshipsPageResponse;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandBus;
+import com.samuel.spaceships.api.Domain.Bus.Query.QueryBus;
+import com.samuel.spaceships.api.Domain.DomainError;
+import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipNotExist;
+import com.samuel.spaceships.api.Infrastructure.Spring.ApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
+import java.util.HashMap;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.PagedModel;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,18 +27,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class SpaceshipsGetController {
-  private final GetAllSpaceshipsCommandHandler getAllSpaceshipsCommandHandler;
-  private final GetSpaceshipByIdCommandHandler getSpaceshipByIdCommandHandler;
-  private final GetSpaceshipsByNameCommandHandler getSpaceshipsByNameCommandHandler;
-  @Qualifier("dtoSpaceshipMapper") private final SpaceshipMapper spaceshipMapper;
 
-  public SpaceshipsGetController(GetAllSpaceshipsCommandHandler getAllSpaceshipsCommandHandler, GetSpaceshipByIdCommandHandler getSpaceshipByIdCommandHandler, GetSpaceshipsByNameCommandHandler getSpaceshipsByNameCommandHandler, SpaceshipMapper spaceshipMapper) {
-    this.getAllSpaceshipsCommandHandler = getAllSpaceshipsCommandHandler;
-    this.getSpaceshipByIdCommandHandler = getSpaceshipByIdCommandHandler;
-    this.getSpaceshipsByNameCommandHandler = getSpaceshipsByNameCommandHandler;
-    this.spaceshipMapper = spaceshipMapper;
+@RestController
+public class SpaceshipsGetController extends ApiController {
+
+  public SpaceshipsGetController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
+  }
+
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return new HashMap<>() {
+      {
+        put(SpaceshipNotExist.class, HttpStatus.NOT_FOUND);
+      }
+    };
   }
 
   @Operation(summary = "Get all spaceships")
@@ -48,12 +50,10 @@ public class SpaceshipsGetController {
       @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   })
   @PreAuthorize("hasAuthority('ROLE_USER')")
-  @GetMapping(value = "/spaceships")
-  public ResponseEntity<PagedModel<EntityModel<SpaceshipDto>>> getAllSpaceships(@ParameterObject Pageable pageable, PagedResourcesAssembler<SpaceshipDto> assembler) {
-    GetAllSpaceshipsCommand command = new GetAllSpaceshipsCommand(pageable);
-    Page<Spaceship> spaceships = getAllSpaceshipsCommandHandler.execute(command);
-    Page<SpaceshipDto> spaceshipDtos = spaceships.map(spaceshipMapper::toDto);
-    return ResponseEntity.ok(assembler.toModel(spaceshipDtos));
+  @GetMapping("/spaceships")
+  public ResponseEntity<Page<SpaceshipResponse>> getAllSpaceships(@ParameterObject Pageable pageable) {
+    SpaceshipsPageResponse response = ask(new GetAllSpaceshipsQuery(pageable));
+    return ResponseEntity.ok(response.getSpaceships());
   }
 
   @Operation(summary = "Get spaceship by ID")
@@ -64,11 +64,9 @@ public class SpaceshipsGetController {
   })
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping(value = "/spaceships/{id}")
-  public ResponseEntity<SpaceshipDto> getSpaceshipById(@PathVariable Long id) {
-    GetSpaceshipByIdCommand command = new GetSpaceshipByIdCommand(id);
-    Spaceship spaceship = getSpaceshipByIdCommandHandler.execute(command);
-    SpaceshipDto spaceshipDto = spaceshipMapper.toDto(spaceship);
-    return ResponseEntity.ok(spaceshipDto);
+  public ResponseEntity<SpaceshipResponse> getSpaceshipById(@PathVariable String id) {
+    SpaceshipResponse response = ask(new GetSpaceshipByIdQuery(id));
+    return ResponseEntity.ok(response);
   }
 
   @Operation(summary = "Get spaceships by name")
@@ -79,11 +77,8 @@ public class SpaceshipsGetController {
   })
   @PreAuthorize("hasAuthority('ROLE_USER')")
   @GetMapping(value = "/spaceships", params = "name")
-  public ResponseEntity<PagedModel<EntityModel<SpaceshipDto>>> getSpaceshipsByName(@RequestParam String name, @ParameterObject Pageable pageable, PagedResourcesAssembler<SpaceshipDto> assembler) {
-    GetSpaceshipsByNameCommand command = new GetSpaceshipsByNameCommand(name, pageable);
-    Page<Spaceship> spaceships = getSpaceshipsByNameCommandHandler.execute(command);
-    Page<SpaceshipDto> spaceshipDtos = spaceships.map(spaceshipMapper::toDto);
-    return ResponseEntity.ok(assembler.toModel(spaceshipDtos));
+  public ResponseEntity<Page<SpaceshipResponse>> getSpaceshipsByName(@RequestParam String name, @ParameterObject Pageable pageable) {
+    SpaceshipsPageResponse response = ask(new GetSpaceshipsByNameQuery(name, pageable));
+    return ResponseEntity.ok(response.getSpaceships());
   }
-
 }

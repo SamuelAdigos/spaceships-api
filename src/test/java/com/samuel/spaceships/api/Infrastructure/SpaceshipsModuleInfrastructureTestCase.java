@@ -1,8 +1,8 @@
 package com.samuel.spaceships.api.Infrastructure;
 
 import com.samuel.spaceships.api.Infrastructure.Persistence.Mapper.SpaceshipMapper;
-import com.samuel.spaceships.api.Infrastructure.Persistence.H2SpaceshipRepository;
-import com.samuel.spaceships.api.Infrastructure.Persistence.SpaceshipJpaRepository;
+import com.samuel.spaceships.api.Infrastructure.Persistence.Mongo.MongoSpaceshipRepository;
+import com.samuel.spaceships.api.Infrastructure.Persistence.Mongo.BaseSpaceshipMongoRepository;
 import com.samuel.spaceships.api.SpaceshipsApiApplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,11 +13,11 @@ import org.springframework.test.context.ContextConfiguration;
 public abstract class SpaceshipsModuleInfrastructureTestCase {
 
   @Autowired
-  protected SpaceshipJpaRepository spaceshipJpaRepository;
+  protected BaseSpaceshipMongoRepository spaceshipMongoRepository;
   @Autowired
   protected SpaceshipMapper spaceshipMapper;
   @Autowired
-  protected H2SpaceshipRepository h2SpaceshipRepository;
+  protected MongoSpaceshipRepository mongoSpaceshipRepository;
 
   private final int MAX_ATTEMPTS                   = 3;
   private final int MILLIS_TO_WAIT_BETWEEN_RETRIES = 300;

@@ -1,15 +1,5 @@
 version: '3'
 services:
-  # Service for the API
-  spaceships-api:
-    build: .
-    ports:
-      - "8080:8080"
-    depends_on:
-      - rabbitmq
-    networks:
-      - mynetwork
-
   # Service for the RabbitMQ
   rabbitmq:
     image: "rabbitmq:3-management"
@@ -19,6 +9,31 @@ services:
     networks:
       - mynetwork
 
+  # Service for MongoDB
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - mongo_data:/data/db
+    networks:
+      - mynetwork
+
+  # Service for the API
+  spaceships-api:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - rabbitmq
+      - mongo
+    networks:
+      - mynetwork
+
 # Network for the services
 networks:
   mynetwork:
+
+volumes:
+  mongo_data:

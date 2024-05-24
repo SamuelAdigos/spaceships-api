@@ -2,11 +2,13 @@ package com.samuel.spaceships.api.Application.Delete;
 
 import com.samuel.spaceships.api.Application.SpaceshipsModuleUnitTestCase;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
+import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipIdMother;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public final class DeleteSpaceshipCommandHandlerShould extends SpaceshipsModuleUnitTestCase {
@@ -16,17 +18,38 @@ public final class DeleteSpaceshipCommandHandlerShould extends SpaceshipsModuleU
   protected void setUp() {
     super.setUp();
 
-    handler = new DeleteSpaceshipCommandHandler(new SpaceshipDeleter(repository));
+    SpaceshipDeleter deleter = new SpaceshipDeleter(repository);
+    handler = new DeleteSpaceshipCommandHandler(deleter);
   }
 
-  @Test
-  void delete_a_valid_spaceship() {
-    final Long CASE_SPACESHIP_ID = 1L;
-    when(repository.existsById(new SpaceshipId(CASE_SPACESHIP_ID))).thenReturn(true);
-    DeleteSpaceshipCommand command = DeleteSpaceshipCommandMother.builder().withId(CASE_SPACESHIP_ID).build();
+  @Nested
+  class when_spaceship_exist {
 
-    handler.run(command);
+    @BeforeEach
+    protected void setUp() {
+      when(repository.existsById(any())).thenReturn(true);
+    }
 
-    verify(repository, atLeastOnce()).deleteById(new SpaceshipId(CASE_SPACESHIP_ID));
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "d290f1ee-6c54-4b01-90e6-d701748f0851",
+        "2c74c9e8-fb9e-4c71-9d98-8b24d5e8bf0b",
+        "3e470ae3-6323-4a0d-9ddf-8b7a91b1db3c"
+    })
+    void delete_a_valid_spaceship(String value) {
+      SpaceshipId spaceshipId = SpaceshipIdMother.create(value);
+      DeleteSpaceshipCommand command = createDeleteSpaceshipCommand(spaceshipId);
+
+      handler.run(command);
+
+      shouldHaveCheckedExistence(spaceshipId);
+      shouldHaveDeleted(spaceshipId);
+    }
   }
+
+  private DeleteSpaceshipCommand createDeleteSpaceshipCommand(SpaceshipId spaceshipId) {
+    return DeleteSpaceshipCommandMother.create(spaceshipId);
+  }
+
+
 }

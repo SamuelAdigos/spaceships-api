@@ -1,24 +1,9 @@
 spring:
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
-      settings:
-        web-allow-others: true
+  data:
+    mongodb:
+      uri: mongodb://mongo:27017/spaceships
   application:
     name: spaceships-api
-  datasource:
-    url: jdbc:h2:mem:spaceships;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driverClassName: org.h2.Driver
-    username: sa
-    password:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: update
-  flyway:
-    locations: classpath:db/migration
-    baseline-on-migrate: true
   rabbitmq:
     host: rabbitmq
     port: 5672

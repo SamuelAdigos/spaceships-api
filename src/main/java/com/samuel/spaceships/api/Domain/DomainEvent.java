@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public abstract class DomainEvent {
-  private Long aggregateId;
+  private String aggregateId;
   private String eventId;
   private String occurredOn;
 
@@ -14,13 +14,13 @@ public abstract class DomainEvent {
     // Constructor sin parámetros necesario para la deserialización de Jackson
   }
 
-  public DomainEvent(Long aggregateId) {
+  public DomainEvent(String aggregateId) {
     this.aggregateId = aggregateId;
     this.eventId = UUID.randomUUID().toString();
     this.occurredOn = LocalDateTime.now().toString();
   }
 
-  public DomainEvent(Long aggregateId, String eventId, String occurredOn) {
+  public DomainEvent(String aggregateId, String eventId, String occurredOn) {
     this.aggregateId = aggregateId;
     this.eventId = eventId;
     this.occurredOn = occurredOn;
@@ -31,13 +31,13 @@ public abstract class DomainEvent {
   public abstract HashMap<String, Serializable> toPrimitives();
 
   public abstract DomainEvent fromPrimitives(
-      Long aggregateId,
+      String aggregateId,
       HashMap<String, Serializable> body,
       String eventId,
       String occurredOn
   );
 
-  public Long aggregateId() {
+  public String aggregateId() {
     return aggregateId;
   }
 

@@ -1,5 +1,7 @@
 package com.samuel.spaceships.api.Application.Get;
 
+import com.samuel.spaceships.api.Application.SpaceshipsPageResponse;
+import com.samuel.spaceships.api.Application.SpaceshipResponse;
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
 import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipNotExist;
@@ -16,17 +18,21 @@ public class SpaceshipGetter {
   private final SpaceshipRepository repository;
 
   @Cacheable("spaceships")
-  public Page<Spaceship> getAllSpaceships(Pageable pageable) {
-    return repository.findAll(pageable);
+  public SpaceshipsPageResponse getAllSpaceships(Pageable pageable) {
+    Page<Spaceship> spaceships = repository.findAll(pageable);
+    return SpaceshipsPageResponse.fromPage(spaceships);
   }
 
   @Cacheable("spaceshipById")
-  public Spaceship getSpaceshipById(Long id) {
-    return repository.findById(new SpaceshipId(id)).orElseThrow(() -> new SpaceshipNotExist(new SpaceshipId(id)));
+  public SpaceshipResponse getSpaceshipById(String id) {
+    Spaceship spaceship = repository.findById(new SpaceshipId(id))
+        .orElseThrow(() -> new SpaceshipNotExist(new SpaceshipId(id)));
+    return SpaceshipResponse.fromAggregate(spaceship);
   }
 
   @Cacheable("spaceshipsByName")
-  public Page<Spaceship> getSpaceshipsByName(String name, Pageable pageable) {
-    return repository.findByNameContaining(name, pageable);
+  public SpaceshipsPageResponse getSpaceshipsByName(String name, Pageable pageable) {
+    Page<Spaceship> spaceships = repository.findByNameContaining(name, pageable);
+    return SpaceshipsPageResponse.fromPage(spaceships);
   }
 }

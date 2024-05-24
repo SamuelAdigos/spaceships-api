@@ -2,14 +2,12 @@ package com.samuel.spaceships.api.Application.Update;
 
 import com.samuel.spaceships.api.Application.SpaceshipsModuleUnitTestCase;
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
-import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipMother;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public final class UpdateSpaceshipCommandHandlerShould extends SpaceshipsModuleUnitTestCase {
@@ -22,18 +20,25 @@ public final class UpdateSpaceshipCommandHandlerShould extends SpaceshipsModuleU
     handler = new UpdateSpaceshipCommandHandler(new SpaceshipUpdater(repository));
   }
 
-  @Test
-  void update_spaceship() {
-    Spaceship spaceship = SpaceshipMother.withDefaults();
-    Long spaceshipId = spaceship.id();
-    String newName = "New Name";
+  @Nested
+  class when_spaceship_exist {
 
-    when(repository.existsById(new SpaceshipId(spaceshipId))).thenReturn(true);
+    @BeforeEach
+    protected void setUp() {
+      when(repository.existsById(any())).thenReturn(true);
+    }
 
-    UpdateSpaceshipCommand command = UpdateSpaceshipCommandMother.builder().withId(spaceshipId).withName(newName).build();
+    @Test
+    void update_spaceship() {
+      UpdateSpaceshipCommand command = UpdateSpaceshipCommandMother.random();
 
-    handler.run(command);
+      Spaceship spaceship = SpaceshipMother.fromRequest(command).build();
+      handler.run(command);
 
-    verify(repository, atLeastOnce()).save(any(Spaceship.class));
+      shouldHaveCheckedExistence(spaceship.id());
+      shouldHaveSaved(spaceship);
+    }
   }
+
+
 }

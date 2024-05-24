@@ -1,24 +1,14 @@
 package com.samuel.spaceships.api.Application.Delete;
 
-public class DeleteSpaceshipCommandMother {
-  public static DeleteSpaceshipCommand withDefaults() {
-    return new DeleteSpaceshipCommand(1L);
+import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
+import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipIdMother;
+
+public final class DeleteSpaceshipCommandMother {
+  public static DeleteSpaceshipCommand create(SpaceshipId id) {
+    return new DeleteSpaceshipCommand(id.value());
   }
 
-  public static Builder builder() {
-    return new Builder();
-  }
-
-  public static class Builder {
-    private Long id = 1L;
-
-    public Builder withId(Long id) {
-      this.id = id;
-      return this;
-    }
-
-    public DeleteSpaceshipCommand build() {
-      return new DeleteSpaceshipCommand(id);
-    }
+  public static DeleteSpaceshipCommand random() {
+    return create(SpaceshipIdMother.random());
   }
 }

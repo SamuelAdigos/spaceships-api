@@ -1,44 +1,50 @@
 package com.samuel.spaceships.api.Domain;
 
+import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipWithInvalidUuidFormat;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
 public abstract class Identifier implements Serializable {
-    final protected String value;
 
-    public Identifier(String value) {
-        ensureValidUuid(value);
+  final protected String value;
 
-        this.value = value;
+  public Identifier(String value) {
+    try {
+      ensureValidUuid(value);
+    } catch (IllegalArgumentException e) {
+      throw new SpaceshipWithInvalidUuidFormat(value);
     }
 
-    protected Identifier() {
-        this.value = null;
-    }
+    this.value = value;
+  }
 
-    public String value() {
-        return value;
-    }
+  protected Identifier() {
+    this.value = null;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Identifier that = (Identifier) o;
-        return value.equals(that.value);
-    }
+  public String value() {
+    return value;
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Identifier that = (Identifier) o;
+    return value.equals(that.value);
+  }
 
-    private void ensureValidUuid(String value) throws IllegalArgumentException {
-        UUID.fromString(value);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
+  }
+
+  private void ensureValidUuid(String value) throws IllegalArgumentException {
+    UUID.fromString(value);
+  }
 }

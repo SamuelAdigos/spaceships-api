@@ -1,17 +1,17 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
 import com.samuel.spaceships.api.Application.Create.CreateSpaceshipCommand;
-import com.samuel.spaceships.api.Application.Create.CreateSpaceshipCommandHandler;
-import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipDto;
-import com.samuel.spaceships.api.Ui.Api.Dto.SpaceshipMapper;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandBus;
+import com.samuel.spaceships.api.Domain.Bus.Command.CommandNotRegisteredError;
+import com.samuel.spaceships.api.Domain.Bus.Query.QueryBus;
+import com.samuel.spaceships.api.Domain.DomainError;
+import com.samuel.spaceships.api.Infrastructure.Spring.ApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.HashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,34 +20,32 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SpaceshipsPostController {
-  private final CreateSpaceshipCommandHandler commandHandler;
-  @Qualifier("dtoSpaceshipMapper") private final SpaceshipMapper spaceshipMapper;
+public class SpaceshipsPostController extends ApiController
+{
+  public SpaceshipsPostController(QueryBus queryBus, CommandBus commandBus) {
+    super(queryBus, commandBus);
+  }
 
-  public SpaceshipsPostController(
-      CreateSpaceshipCommandHandler commandHandler,
-      SpaceshipMapper spaceshipMapper
-  ) {
-    this.commandHandler = commandHandler;
-    this.spaceshipMapper = spaceshipMapper;
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return null;
   }
 
   @Operation(summary = "Create a new spaceship")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Spaceship created successfully", content = {
-          @Content(mediaType = "application/json", schema = @Schema(implementation = SpaceshipDto.class))
+          @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
       }),
       @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content),
       @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
   })
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @PostMapping(value = "/spaceships")
-  public ResponseEntity<SpaceshipDto> create(
-      @RequestBody SpaceshipsPostControllerRequestBody body
-  ) {
-    var command = new CreateSpaceshipCommand(body.name(), body.franchise(), body.maxSpeed());
-    Spaceship spaceship = commandHandler.execute(command);
-    SpaceshipDto spaceshipDto = spaceshipMapper.toDto(spaceship);
-    return ResponseEntity.status(HttpStatus.CREATED).body(spaceshipDto);
+  public ResponseEntity<String> create(
+      @RequestBody SpaceshipsDetailsRequestBody request
+  ) throws CommandNotRegisteredError {
+    dispatch(new CreateSpaceshipCommand(request.getName(), request.getFranchise(), request.getMaxSpeed()));
+
+    return new ResponseEntity<>(HttpStatus.CREATED);
   }
 }

@@ -27,7 +27,7 @@ public class SpaceshipsDeleteController {
       @ApiResponse(responseCode = "500", description = "An internal server error occurred", content = @Content) })
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @DeleteMapping("/spaceships/{id}")
-  public ResponseEntity<Void> deleteSpaceship(@PathVariable Long id) {
+  public ResponseEntity<Void> deleteSpaceship(@PathVariable String id) {
     DeleteSpaceshipCommand command = new DeleteSpaceshipCommand(id);
     deleteSpaceshipCommandHandler.execute(command);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

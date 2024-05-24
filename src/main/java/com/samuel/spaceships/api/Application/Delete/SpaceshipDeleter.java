@@ -14,13 +14,12 @@ public class SpaceshipDeleter {
   private final SpaceshipRepository repository;
 
   @CacheEvict(value = "spaceshipById", key = "#id")
-  public Void delete(Long id) {
+  public void delete(String id) {
     SpaceshipId spaceshipId = new SpaceshipId(id);
     if (!repository.existsById(spaceshipId)) {
       throw new SpaceshipNotExist(spaceshipId);
     }
 
     repository.deleteById(spaceshipId);
-    return null;
   }
 }
