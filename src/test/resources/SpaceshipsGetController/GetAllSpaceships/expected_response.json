@@ -1,78 +1,62 @@
-{
-  "content": [
-    {
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "name": "USS Enterprise",
-      "franchise": "Star Trek",
-      "maxSpeed": 9.975
-    },
-    {
-      "id": "550e8400-e29b-41d4-a716-446655440000",
-      "name": "Millennium Falcon",
-      "franchise": "Star Wars",
-      "maxSpeed": 9.5
-    },
-    {
-      "id": "6f0f9b2a-5a4d-4b56-84e5-bc8e589d7af2",
-      "name": "Serenity",
-      "franchise": "Firefly",
-      "maxSpeed": 7.5
-    },
-    {
-      "id": "0e3c53f8-82a2-4d77-b3c6-9d2e5e5d96f4",
-      "name": "Battlestar Galactica",
-      "franchise": "Battlestar Galactica",
-      "maxSpeed": 8.5
-    },
-    {
-      "id": "1f4f946b-19f6-4a13-9f3c-d6e9cb8e6d1e",
-      "name": "Nebuchadnezzar",
-      "franchise": "The Matrix",
-      "maxSpeed": 8.0
-    },
-    {
-      "id": "2d86c5aa-5d89-4b2b-a568-8f45b6de98f5",
-      "name": "Heart of Gold",
-      "franchise": "The Hitchhiker's Guide to the Galaxy",
-      "maxSpeed": 9.9
-    },
-    {
-      "id": "3e78d4d9-6d1c-4b7a-a6b6-f36d5d9f6f77",
-      "name": "Nostromo",
-      "franchise": "Alien",
-      "maxSpeed": 7.0
-    },
-    {
-      "id": "4f8a53b8-7d2e-4b8a-9c3c-e48e5f6e6e88",
-      "name": "Event Horizon",
-      "franchise": "Event Horizon",
-      "maxSpeed": 9.0
-    },
-    {
-      "id": "5f9c64c7-8e3d-4b9b-a7c7-f57e6d7e7f99",
-      "name": "Discovery One",
-      "franchise": "2001: A Space Odyssey",
-      "maxSpeed": 7.5
-    },
-    {
-      "id": "6f0d75a6-9e4f-4ba9-a8d8-048f5e8f8f10",
-      "name": "Star Destroyer",
-      "franchise": "Star Wars",
-      "maxSpeed": 9.0
-    }
-  ],
-  "pageable": "INSTANCE",
-  "totalPages": 1,
-  "totalElements": 10,
-  "last": true,
-  "size": 10,
-  "number": 0,
-  "sort": {
-    "empty": true,
-    "unsorted": true,
-    "sorted": false
+[
+  {
+    "franchise": "Star Trek",
+    "name": "USS Enterprise",
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "maxSpeed": "9.975"
   },
-  "numberOfElements": 10,
-  "first": true,
-  "empty": false
-}
+  {
+    "franchise": "Star Wars",
+    "name": "Millennium Falcon",
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "maxSpeed": "9.5"
+  },
+  {
+    "franchise": "Firefly",
+    "name": "Serenity",
+    "id": "6f0f9b2a-5a4d-4b56-84e5-bc8e589d7af2",
+    "maxSpeed": "7.5"
+  },
+  {
+    "franchise": "Battlestar Galactica",
+    "name": "Battlestar Galactica",
+    "id": "0e3c53f8-82a2-4d77-b3c6-9d2e5e5d96f4",
+    "maxSpeed": "8.5"
+  },
+  {
+    "franchise": "The Matrix",
+    "name": "Nebuchadnezzar",
+    "id": "1f4f946b-19f6-4a13-9f3c-d6e9cb8e6d1e",
+    "maxSpeed": "8.0"
+  },
+  {
+    "franchise": "The Hitchhiker's Guide to the Galaxy",
+    "name": "Heart of Gold",
+    "id": "2d86c5aa-5d89-4b2b-a568-8f45b6de98f5",
+    "maxSpeed": "9.9"
+  },
+  {
+    "franchise": "Alien",
+    "name": "Nostromo",
+    "id": "3e78d4d9-6d1c-4b7a-a6b6-f36d5d9f6f77",
+    "maxSpeed": "7.0"
+  },
+  {
+    "franchise": "Event Horizon",
+    "name": "Event Horizon",
+    "id": "4f8a53b8-7d2e-4b8a-9c3c-e48e5f6e6e88",
+    "maxSpeed": "9.0"
+  },
+  {
+    "franchise": "2001: A Space Odyssey",
+    "name": "Discovery One",
+    "id": "5f9c64c7-8e3d-4b9b-a7c7-f57e6d7e7f99",
+    "maxSpeed": "7.5"
+  },
+  {
+    "franchise": "Star Wars",
+    "name": "Star Destroyer",
+    "id": "6f0d75a6-9e4f-4ba9-a8d8-048f5e8f8f10",
+    "maxSpeed": "9.0"
+  }
+]
