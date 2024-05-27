@@ -1,33 +1,31 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
-import com.samuel.spaceships.api.Application.Get.SpaceshipGetter;
+import com.samuel.spaceships.api.Application.Search.SpaceshipsByCriteriaSearcher;
 import com.samuel.spaceships.api.Application.SpaceshipResponse;
-import com.samuel.spaceships.api.Application.SpaceshipsPageResponse;
-import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
+import com.samuel.spaceships.api.Application.SpaceshipsResponse;
 import com.samuel.spaceships.api.Ui.Api.Controller.common.BaseControllerTest;
 import com.samuel.spaceships.api.Ui.Api.Controller.common.TestDataUtil;
 import java.util.List;
 import lombok.val;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 public class SpaceshipsGetControllerShould extends BaseControllerTest {
 
   @MockBean
-  SpaceshipGetter spaceshipGetter;
+  SpaceshipsByCriteriaSearcher spaceshipsByCriteriaSearcher;
 
   @Test
   @WithMockUser(roles = "USER")
   public void shouldReturnAllSpaceships() throws Exception {
-    List<Spaceship> spaceshipList = TestDataUtil.getSpaceships();
-    mockSpaceshipsData(spaceshipList);
+    List<SpaceshipResponse> spaceshipResponseList = TestDataUtil.getSpaceships().stream()
+        .map(SpaceshipResponse::fromAggregate)
+        .toList();
+    mockWhenGetAllSpaceshipsData(spaceshipResponseList);
 
     assertResponse(
         "/spaceships",
@@ -40,11 +38,13 @@ public class SpaceshipsGetControllerShould extends BaseControllerTest {
   @WithMockUser(roles = "USER")
   public void shouldReturnSpaceshipById() throws Exception {
     val uuidToFind = "123e4567-e89b-12d3-a456-426614174000";
-    Spaceship spaceship = TestDataUtil.getSpaceshipById(uuidToFind);
-    mockSpaceshipByIdData(spaceship);
+    List<SpaceshipResponse> spaceshipResponseList = List.of(
+        SpaceshipResponse.fromAggregate(TestDataUtil.getSpaceshipById(uuidToFind)));
+    mockWhenGetSpaceshipById(spaceshipResponseList);
 
     assertResponse(
-        "/spaceships/" + uuidToFind,
+        "/spaceships?filters%5B0%5D%5Bvalue%5D=" + uuidToFind
+            + "&filters%5B0%5D%5Bfield%5D=id&filters%5B0%5D%5Boperator%5D=EQUAL",
         200,
         getExpectedResponse(
             "SpaceshipsGetController/GetSpaceshipById/expected_response.json"));
@@ -54,30 +54,36 @@ public class SpaceshipsGetControllerShould extends BaseControllerTest {
   @WithMockUser(roles = "USER")
   public void shouldReturnSpaceshipByName() throws Exception {
     val nameToFind = "star";
-    List<Spaceship> spaceshipList = TestDataUtil.getSpaceshipsByName(nameToFind);
-    mockSpaceshipByNameData(spaceshipList);
+    List<SpaceshipResponse> spaceshipResponseList = TestDataUtil.getSpaceshipsByName(nameToFind)
+        .stream()
+        .map(SpaceshipResponse::fromAggregate)
+        .toList();
+    mockWhenGetSpaceshipByName(spaceshipResponseList);
 
     assertResponse(
-        "/spaceships?name=" + nameToFind,
+        "/spaceships?filters%5B0%5D%5Bvalue%5D=" + nameToFind
+            + "&filters%5B0%5D%5Bfield%5D=name&filters%5B0%5D%5Boperator%5D=CONTAINS",
         200,
         getExpectedResponse(
             "SpaceshipsGetController/GetSpaceshipByName/expected_response.json"));
   }
 
-  private void mockSpaceshipsData(List<Spaceship> spaceshipList) {
-    Page<Spaceship> spaceshipsPage = new PageImpl<>(spaceshipList);
-    SpaceshipsPageResponse response = SpaceshipsPageResponse.fromPage(spaceshipsPage);
-    when(spaceshipGetter.getAllSpaceships(any())).thenReturn(response);
+  private void mockWhenGetAllSpaceshipsData(List<SpaceshipResponse> spaceshipList) {
+    SpaceshipsResponse spaceshipsPageResponse = new SpaceshipsResponse(spaceshipList);
+    when(spaceshipsByCriteriaSearcher.search(any(), any(), any(), any())).thenReturn(
+        spaceshipsPageResponse);
   }
 
-  private void mockSpaceshipByIdData(Spaceship spaceship) {
-    when(spaceshipGetter.getSpaceshipById(any())).thenReturn(
-        SpaceshipResponse.fromAggregate(spaceship));
+  private void mockWhenGetSpaceshipById(List<SpaceshipResponse> spaceshipList) {
+    SpaceshipsResponse spaceshipsPageResponse = new SpaceshipsResponse(spaceshipList);
+    when(spaceshipsByCriteriaSearcher.search(any(), any(), any(),
+        any())).thenReturn(
+        spaceshipsPageResponse);
   }
 
-  private void mockSpaceshipByNameData(List<Spaceship> spaceshipList) {
-    Page<Spaceship> spaceshipsPage = new PageImpl<>(spaceshipList);
-    SpaceshipsPageResponse response = SpaceshipsPageResponse.fromPage(spaceshipsPage);
-    when(spaceshipGetter.getSpaceshipsByName(anyString(), any())).thenReturn(response);
+  private void mockWhenGetSpaceshipByName(List<SpaceshipResponse> spaceshipList) {
+    SpaceshipsResponse spaceshipsPageResponse = new SpaceshipsResponse(spaceshipList);
+    when(spaceshipsByCriteriaSearcher.search(any(), any(), any(), any())).thenReturn(
+        spaceshipsPageResponse);
   }
 }

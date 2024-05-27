@@ -1,9 +1,7 @@
 package com.samuel.spaceships.api.Ui.Api.Controller;
 
 import com.samuel.spaceships.api.Domain.Spaceship.Repository.SpaceshipRepository;
-import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Ui.Api.Controller.common.BaseControllerTest;
-import com.samuel.spaceships.api.Ui.Api.Controller.common.TestDataUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,7 +18,7 @@ public class SpaceshipsPutControllerShould extends BaseControllerTest {
   @WithMockUser(roles = "ADMIN")
   void update_a_existing_spaceship_with_user_with_permissions() throws Exception {
     final String UUID = "123e4567-e89b-12d3-a456-426614174000";
-    givenUpdateDataBehaviourMocked(UUID);
+    givenUpdateDataBehaviourMocked();
 
     assertRequestWithBody(
         "PUT",
@@ -30,9 +28,7 @@ public class SpaceshipsPutControllerShould extends BaseControllerTest {
     );
   }
 
-  private void givenUpdateDataBehaviourMocked(String uuid) throws Exception {
-    Spaceship spaceship = TestDataUtil.getSpaceshipById(uuid);
+  private void givenUpdateDataBehaviourMocked() {
     when(spaceshipRepository.existsById(any())).thenReturn(true);
-    when(spaceshipRepository.save(any())).thenReturn(spaceship);
   }
 }
