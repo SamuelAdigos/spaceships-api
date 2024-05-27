@@ -1,8 +1,8 @@
 package com.samuel.spaceships.api.Application.Create;
 
 import com.samuel.spaceships.api.Domain.EventBus;
-import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Domain.Spaceship.Repository.SpaceshipRepository;
+import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipFranchise;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipName;
@@ -21,7 +21,6 @@ public class SpaceshipCreator {
   private final SpaceshipRepository repository;
   private final EventBus eventBus;
   private static final Logger logger = LoggerFactory.getLogger(SpaceshipCreator.class);
-
 
 
   public void create(SpaceshipName name, SpaceshipFranchise franchise, SpaceshipSpeed maxSpeed) {

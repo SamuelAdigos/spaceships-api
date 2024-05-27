@@ -7,12 +7,13 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "spaceship")
+@Document(collection = "spaceships")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpaceshipData {
+
   @Id
   private String id;
 

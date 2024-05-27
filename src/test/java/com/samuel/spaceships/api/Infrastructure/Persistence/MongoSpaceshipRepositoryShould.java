@@ -1,22 +1,22 @@
 package com.samuel.spaceships.api.Infrastructure.Persistence;
 
+import com.samuel.spaceships.api.Domain.Criteria.Criteria;
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
-import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipIdMother;
+import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipCriteriaMother;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipMother;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipNameMother;
 import com.samuel.spaceships.api.Infrastructure.SpaceshipsModuleInfrastructureTestCase;
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MongoSpaceshipRepositoryShould extends SpaceshipsModuleInfrastructureTestCase {
+
   @Test
   void save_a_spaceship() {
     Spaceship spaceship = SpaceshipMother.random();
@@ -27,23 +27,25 @@ public class MongoSpaceshipRepositoryShould extends SpaceshipsModuleInfrastructu
   @Test
   void return_an_existing_spaceship() {
     Spaceship spaceship = SpaceshipMother.random();
-    Spaceship savedSpaceship = mongoSpaceshipRepository.save(spaceship);
+    mongoSpaceshipRepository.save(spaceship);
 
-    Optional<Spaceship> found = mongoSpaceshipRepository.findById(savedSpaceship.id());
+    Criteria criteria = SpaceshipCriteriaMother.nameContains(spaceship.name().value());
+    List<Spaceship> found = mongoSpaceshipRepository.matching(criteria);
 
-    assertThat(found).isEqualTo(Optional.of(spaceship));
+    assertThat(found).contains(spaceship);
   }
 
   @Test
-  void return_all_spaceships() throws Exception {
+  void return_all_spaceships_with_no_criteria() throws Exception {
     Spaceship spaceship1 = SpaceshipMother.random();
     Spaceship spaceship2 = SpaceshipMother.random();
     mongoSpaceshipRepository.save(spaceship1);
     mongoSpaceshipRepository.save(spaceship2);
 
     eventually(() -> {
-      Page<Spaceship> found = mongoSpaceshipRepository.findAll(Pageable.unpaged());
-      assertThat(found.getContent()).containsExactlyInAnyOrder(spaceship1, spaceship2);
+      Criteria criteria = SpaceshipCriteriaMother.emptyCriteria();
+      List<Spaceship> found = mongoSpaceshipRepository.matching(criteria);
+      assertThat(found).containsExactlyInAnyOrder(spaceship1, spaceship2);
     });
   }
 
@@ -53,8 +55,9 @@ public class MongoSpaceshipRepositoryShould extends SpaceshipsModuleInfrastructu
     mongoSpaceshipRepository.save(spaceship);
 
     eventually(() -> {
-      Page<Spaceship> found = mongoSpaceshipRepository.findByNameContaining(nameToSearch, Pageable.unpaged());
-      assertThat(found.getContent()).containsExactly(spaceship);
+      Criteria criteria = SpaceshipCriteriaMother.nameContains(nameToSearch);
+      List<Spaceship> found = mongoSpaceshipRepository.matching(criteria);
+      assertThat(found).containsExactly(spaceship);
     });
   }
 
@@ -65,38 +68,29 @@ public class MongoSpaceshipRepositoryShould extends SpaceshipsModuleInfrastructu
 
     mongoSpaceshipRepository.deleteById(spaceship.id());
 
-    Optional<Spaceship> found = mongoSpaceshipRepository.findById(spaceship.id());
-    assertThat(found).isEmpty();
+    Boolean found = mongoSpaceshipRepository.existsById(spaceship.id());
+    assertThat(found).isFalse();
   }
 
   @Test
-  void return_spaceships_by_name() throws Exception {
-    final String STARSHIP_NAME = "Enterprise";
-    Spaceship spaceship = SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create(STARSHIP_NAME)).build();
-    mongoSpaceshipRepository.save(spaceship);
-
-    eventually(() -> {
-        Page<Spaceship> found = mongoSpaceshipRepository.findByNameContaining(STARSHIP_NAME, Pageable.unpaged());
-        assertThat(found.getContent()).containsExactly(spaceship);
-    });
-  }
-
-@Test
-void check_spaceship_exists() throws Exception {
+  void check_spaceship_exists() throws Exception {
     Spaceship spaceship = SpaceshipMother.random();
     mongoSpaceshipRepository.save(spaceship);
 
     eventually(() -> {
-        boolean exists = mongoSpaceshipRepository.existsById(spaceship.id());
-        assertThat(exists).isTrue();
+      boolean exists = mongoSpaceshipRepository.existsById(spaceship.id());
+      assertThat(exists).isTrue();
     });
-}
+  }
 
   private static Stream<Arguments> provideSpaceshipsForTest() {
     return Stream.of(
-        Arguments.of(SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create("Enterprise")).build(), "Enterprise"),
-        Arguments.of(SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create("Millenium Falcon")).build(), "Falcon"),
-        Arguments.of(SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create("Serenity")), "Serenity")
+        Arguments.of(
+            SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create("Enterprise")).build(),
+            "Enterprise"),
+        Arguments.of(
+            SpaceshipMother.randomBuilder().name(SpaceshipNameMother.create("Millenium Falcon"))
+                .build(), "Falcon")
     );
   }
 }

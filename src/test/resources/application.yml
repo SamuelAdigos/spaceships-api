@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      database: spaceships
+      port: ${mongodb.container.port}
+      host: localhost
+  rabbitmq:
+    host: localhost
+    port: ${rabbitmq.container.port}
+    username: guest
+    password: guest

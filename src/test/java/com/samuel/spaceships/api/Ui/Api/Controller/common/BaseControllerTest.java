@@ -2,6 +2,9 @@ package com.samuel.spaceships.api.Ui.Api.Controller.common;
 
 import com.samuel.spaceships.api.Domain.DomainEvent;
 import com.samuel.spaceships.api.Domain.EventBus;
+import com.samuel.spaceships.api.MongoDbTestContainerConfig;
+import com.samuel.spaceships.api.RabbitMqTestContainerConfig;
+import com.samuel.spaceships.api.SpaceshipsApiApplication;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -11,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
@@ -23,6 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@ContextConfiguration(classes = {SpaceshipsApiApplication.class, MongoDbTestContainerConfig.class,
+    RabbitMqTestContainerConfig.class})
 public abstract class BaseControllerTest {
 
   @Autowired

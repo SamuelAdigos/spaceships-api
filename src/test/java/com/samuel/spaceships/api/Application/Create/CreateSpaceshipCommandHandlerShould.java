@@ -10,14 +10,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.mockito.Mockito.when;
+
 public final class CreateSpaceshipCommandHandlerShould extends SpaceshipsModuleUnitTestCase {
+
   private CreateSpaceshipCommandHandler handler;
 
   @BeforeEach
   protected void setUp() {
     super.setUp();
 
-    handler = new CreateSpaceshipCommandHandler(new SpaceshipCreator(uuidGenerator, repository, eventBus));
+    handler = new CreateSpaceshipCommandHandler(
+        new SpaceshipCreator(uuidGenerator, repository, eventBus));
   }
 
   @ParameterizedTest
@@ -30,9 +34,11 @@ public final class CreateSpaceshipCommandHandlerShould extends SpaceshipsModuleU
     CreateSpaceshipCommand command = CreateSpaceshipCommandMother.random();
     Spaceship spaceship = SpaceshipMother
         .fromRequest(command)
-            .id(SpaceshipIdMother.create(idValue))
+        .id(SpaceshipIdMother.create(idValue))
         .build();
-    SpaceshipCreatedDomainEvent domainEvent = SpaceshipCreatedDomainEventMother.fromSpaceship(spaceship);
+    when(uuidGenerator.generate()).thenReturn(idValue);
+    SpaceshipCreatedDomainEvent domainEvent = SpaceshipCreatedDomainEventMother.fromSpaceship(
+        spaceship);
 
     handler.run(command);
 
