@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public abstract class SpaceshipsModuleUnitTestCase {
+
   protected UuidGenerator uuidGenerator;
   protected SpaceshipRepository repository;
   protected EventBus eventBus;
