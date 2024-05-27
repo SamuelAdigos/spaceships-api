@@ -18,16 +18,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SpaceshipsDeleteController {
 
- private final DeleteSpaceshipCommandHandler deleteSpaceshipCommandHandler;
+  private final DeleteSpaceshipCommandHandler deleteSpaceshipCommandHandler;
 
   @Operation(summary = "Delete a spaceship")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "204", description = "The spaceship was deleted"),
       @ApiResponse(responseCode = "404", description = "Spaceship not found", content = @Content),
-      @ApiResponse(responseCode = "500", description = "An internal server error occurred", content = @Content) })
+      @ApiResponse(responseCode = "500", description = "An internal server error occurred", content = @Content)})
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @DeleteMapping("/spaceships/{id}")
-  public ResponseEntity<Void> deleteSpaceship(@PathVariable String id) {
+  public ResponseEntity<Void> index(@PathVariable String id) {
     DeleteSpaceshipCommand command = new DeleteSpaceshipCommand(id);
     deleteSpaceshipCommandHandler.execute(command);
     return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

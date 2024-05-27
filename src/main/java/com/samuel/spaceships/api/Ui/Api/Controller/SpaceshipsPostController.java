@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class SpaceshipsPostController extends ApiController
-{
+public class SpaceshipsPostController extends ApiController {
+
   public SpaceshipsPostController(QueryBus queryBus, CommandBus commandBus) {
     super(queryBus, commandBus);
   }
@@ -41,10 +41,11 @@ public class SpaceshipsPostController extends ApiController
   })
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @PostMapping(value = "/spaceships")
-  public ResponseEntity<String> create(
+  public ResponseEntity<String> index(
       @RequestBody SpaceshipsDetailsRequestBody request
   ) throws CommandNotRegisteredError {
-    dispatch(new CreateSpaceshipCommand(request.getName(), request.getFranchise(), request.getMaxSpeed()));
+    dispatch(new CreateSpaceshipCommand(request.getName(), request.getFranchise(),
+        request.getMaxSpeed()));
 
     return new ResponseEntity<>(HttpStatus.CREATED);
   }
