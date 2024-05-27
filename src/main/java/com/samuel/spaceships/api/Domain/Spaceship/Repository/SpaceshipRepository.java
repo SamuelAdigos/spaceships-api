@@ -1,20 +1,15 @@
 package com.samuel.spaceships.api.Domain.Spaceship.Repository;
 
+import com.samuel.spaceships.api.Domain.Criteria.Criteria;
 import com.samuel.spaceships.api.Domain.Spaceship.Spaceship;
 import com.samuel.spaceships.api.Domain.Spaceship.SpaceshipId;
-import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
+import java.util.List;
 
 public interface SpaceshipRepository {
-  Spaceship save(Spaceship spaceship);
 
-  Optional<Spaceship> findById(SpaceshipId id);
+  void save(Spaceship spaceship);
 
-  Page<Spaceship> findAll(Pageable pageable);
-
-  Page<Spaceship> findByNameContaining(String name, Pageable pageable);
+  List<Spaceship> matching(Criteria criteria);
 
   void deleteById(SpaceshipId id);
 
