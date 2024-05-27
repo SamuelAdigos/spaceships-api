@@ -21,8 +21,8 @@ function generateUUID() {
 
 db = db.getSiblingDB('spaceships');
 
-db.createCollection('spaceship');
-db.spaceship.insertMany([
+db.createCollection('spaceships');
+db.spaceships.insertMany([
   {
     _id: generateUUID(),
     _class: "com.samuel.spaceships.api.Infrastructure.Persistence.Mongo.SpaceshipData",
