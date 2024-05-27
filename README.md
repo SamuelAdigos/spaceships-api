@@ -27,6 +27,10 @@ Using the latest stable versions of:
 - **spring-boot-devtools**: Development tools that enable automatic application reload on code
   changes.
 
+### JSON Serialization
+
+- **gson**: JSON serialization and deserialization library.
+
 ### JAXB Dependencies
 
 - **jakarta.xml.bind-api**: JAXB API for mapping XML data to Java objects and vice versa.
@@ -64,6 +68,8 @@ Using the latest stable versions of:
 - **spring-boot-starter-test**: Necessary dependencies for testing.
 - **javafaker**: Test data generator.
 - **spring-security-test**: Supports security testing.
+- **junit-jupiter**: JUnit 5 for unit testing.
+- **testcontainers**: Supports integration testing with Docker containers.
 
 ## Installation Guide
 
@@ -166,7 +172,7 @@ There are two users with different roles:
 - NormalUser:1234
 - Admin:1234
 
-### Get all spaceships
+### Get all spaceships without any filter/order
 
 ```sh
 curl -u NormalUser:1234 -X GET http://localhost:8080/spaceships
@@ -175,19 +181,19 @@ curl -u NormalUser:1234 -X GET http://localhost:8080/spaceships
 ### Get paginated spaceships
 
 ```sh
-curl -u NormalUser:1234 -X GET "http://localhost:8080/spaceships?page=0&size=5&sort=name"
+curl -u NormalUser:1234 -X GET 'http://localhost:8080/spaceships?limit=2&offset=3'
 ```
 
 ### Get spaceship by ID
 
 ```sh
-curl -u NormalUser:1234 -X GET http://localhost:8080/spaceships/{id}
+curl -u NormalUser:1234 -X GET 'http://localhost:8080/spaceships?filters%5B0%5D%5Bvalue%5D={uuid}&filters%5B0%5D%5Bfield%5D=id&filters%5B0%5D%5Boperator%5D=EQUAL'
 ```
 
 ### Get spaceships by name
 
 ```sh
-curl -u NormalUser:1234 -X GET "http://localhost:8080/spaceships?name={name}"
+curl -u NormalUser:1234 -X GET 'http://localhost:8080/spaceships?filters%5B0%5D%5Bvalue%5D={name}&filters%5B0%5D%5Bfield%5D=name&filters%5B0%5D%5Boperator%5D=EQUAL'
 ```
 
 ### Create a new spaceship
@@ -199,13 +205,13 @@ curl -u Admin:1234 -X POST -H "Content-Type: application/json" -d '{"name":"Spac
 ### Update an existing spaceship
 
 ```sh
-curl -u Admin:1234 -X PUT -H "Content-Type: application/json" -d '{"name":"New Spaceship Name", "franchise":"New Spaceship Franchise", "maxSpeed":12345}' http://localhost:8080/spaceships/2b1fcfae-757c-463f-9c9f-e5785d29f452
+curl -u Admin:1234 -X PUT -H "Content-Type: application/json" -d '{"name":"New Spaceship Name", "franchise":"New Spaceship Franchise", "maxSpeed":12345}' http://localhost:8080/spaceships/{uuid}
 ```
 
 ### Delete a spaceship
 
 ```sh
-curl -u Admin:1234 -X DELETE http://localhost:8080/spaceships/2b1fcfae-757c-463f-9c9f-e5785d29f452
+curl -u Admin:1234 -X DELETE http://localhost:8080/spaceships/7276d2ba-de4c-4792-9a78-16615102b20e
 ```
 
 ## Feedback
@@ -238,6 +244,6 @@ of writing log if the ID is negative, as requested.
 I have created an initial script to enter data into the Mongo database called init-mongo.js which is
 located in the root folder. There are the data of 10 test spaceships.
 
-I have used various design patterns (Object Mother, Builder, CQRS, etc.).
+I have used various design patterns (Criteria, Object Mother, Builder, CQRS, etc.).
 
 If u want give me feedback, please, write me to my mail: svila.smr@gmail.com
