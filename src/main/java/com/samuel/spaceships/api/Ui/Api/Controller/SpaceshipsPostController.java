@@ -26,11 +26,6 @@ public class SpaceshipsPostController extends ApiController {
     super(queryBus, commandBus);
   }
 
-  @Override
-  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return null;
-  }
-
   @Operation(summary = "Create a new spaceship")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "Spaceship created successfully", content = {
@@ -48,5 +43,11 @@ public class SpaceshipsPostController extends ApiController {
         request.getMaxSpeed()));
 
     return new ResponseEntity<>(HttpStatus.CREATED);
+  }
+
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return new HashMap<>() {
+    };
   }
 }

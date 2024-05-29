@@ -6,6 +6,7 @@ import com.samuel.spaceships.api.Domain.Bus.Command.CommandNotRegisteredError;
 import com.samuel.spaceships.api.Domain.Bus.Query.QueryBus;
 import com.samuel.spaceships.api.Domain.DomainError;
 import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipNotExist;
+import com.samuel.spaceships.api.Domain.Spaceship.Errors.SpaceshipWithInvalidUuidFormat;
 import com.samuel.spaceships.api.Infrastructure.Spring.ApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,15 +28,6 @@ public class SpaceshipsPutController extends ApiController {
     super(queryBus, commandBus);
   }
 
-  @Override
-  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return new HashMap<>() {
-      {
-        put(SpaceshipNotExist.class, HttpStatus.NOT_FOUND);
-      }
-    };
-  }
-
   @Operation(summary = "Update an existing spaceship")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Spaceship updated successfully", content = @Content),
@@ -46,11 +38,22 @@ public class SpaceshipsPutController extends ApiController {
   @PreAuthorize("hasAuthority('ROLE_ADMIN')")
   @PutMapping(value = "/spaceships/{id}")
   public ResponseEntity<String> index(
-    @PathVariable String id,
-    @RequestBody SpaceshipsDetailsRequestBody request
+      @PathVariable String id,
+      @RequestBody SpaceshipsDetailsRequestBody request
   ) throws CommandNotRegisteredError {
-    dispatch(new UpdateSpaceshipCommand(id, request.getName(), request.getFranchise(), request.getMaxSpeed()));
+    dispatch(new UpdateSpaceshipCommand(id, request.getName(), request.getFranchise(),
+        request.getMaxSpeed()));
 
     return new ResponseEntity<>(HttpStatus.OK);
+  }
+
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return new HashMap<>() {
+      {
+        put(SpaceshipWithInvalidUuidFormat.class, HttpStatus.BAD_REQUEST);
+        put(SpaceshipNotExist.class, HttpStatus.NOT_FOUND);
+      }
+    };
   }
 }

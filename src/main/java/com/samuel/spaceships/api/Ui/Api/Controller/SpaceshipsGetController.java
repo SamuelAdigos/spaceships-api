@@ -75,12 +75,6 @@ public class SpaceshipsGetController extends ApiController {
         .collect(Collectors.toList());
   }
 
-
-  @Override
-  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
-    return null;
-  }
-
   private List<HashMap<String, String>> parseFilters(HashMap<String, Serializable> params) {
     int maxParams = params.size();
 
@@ -102,5 +96,11 @@ public class SpaceshipsGetController extends ApiController {
       }
     }
     return filters;
+  }
+
+  @Override
+  public HashMap<Class<? extends DomainError>, HttpStatus> errorMapping() {
+    return new HashMap<>() {
+    };
   }
 }
