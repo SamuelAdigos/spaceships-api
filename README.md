@@ -63,6 +63,10 @@ Using the latest stable versions of:
 
 - **springdoc-openapi-starter-webmvc-ui**: Supports API documentation using OpenAPI.
 
+### Google library
+
+- **guava**: Google's core libraries for Java.
+
 ### Testing Dependencies
 
 - **spring-boot-starter-test**: Necessary dependencies for testing.
