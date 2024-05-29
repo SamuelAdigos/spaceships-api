@@ -63,6 +63,10 @@ Using the latest stable versions of:
 
 - **springdoc-openapi-starter-webmvc-ui**: Supports API documentation using OpenAPI.
 
+### Google library
+
+- **guava**: Google's core libraries for Java.
+
 ### Testing Dependencies
 
 - **spring-boot-starter-test**: Necessary dependencies for testing.
@@ -109,7 +113,6 @@ Create a Docker network to enable communication between the services:
 Make sure you have the following docker-compose.yml file in the root of your project:
 
 ```
-version: '3'
 services:
   # Service for the RabbitMQ
   rabbitmq:

@@ -26,6 +26,7 @@
     <open-api.version>2.5.0</open-api.version>
     <javafaker.version>1.0.2</javafaker.version>
     <testcontainers.version>1.19.8</testcontainers.version>
+    <guava.version>33.2.0-jre</guava.version>
 
     <!-- Plugin versions -->
     <plugin.maven-surefire-plugin.version>3.2.5</plugin.maven-surefire-plugin.version>
@@ -131,6 +132,13 @@
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
       <version>${open-api.version}</version>
+    </dependency>
+
+    <!-- Google library -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
     </dependency>
 
     <!-- Testing Dependencies -->

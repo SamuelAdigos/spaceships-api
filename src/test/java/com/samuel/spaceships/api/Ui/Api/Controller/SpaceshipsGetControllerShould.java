@@ -21,7 +21,7 @@ public class SpaceshipsGetControllerShould extends BaseControllerTest {
 
   @Test
   @WithMockUser(roles = "USER")
-  public void shouldReturnAllSpaceships() throws Exception {
+  public void get_all_spaceships_with_user_with_permissions() throws Exception {
     List<SpaceshipResponse> spaceshipResponseList = TestDataUtil.getSpaceships().stream()
         .map(SpaceshipResponse::fromAggregate)
         .toList();
@@ -36,7 +36,7 @@ public class SpaceshipsGetControllerShould extends BaseControllerTest {
 
   @Test
   @WithMockUser(roles = "USER")
-  public void shouldReturnSpaceshipById() throws Exception {
+  public void get_spaceship_by_id_with_user_with_permissions() throws Exception {
     val uuidToFind = "123e4567-e89b-12d3-a456-426614174000";
     List<SpaceshipResponse> spaceshipResponseList = List.of(
         SpaceshipResponse.fromAggregate(TestDataUtil.getSpaceshipById(uuidToFind)));
@@ -52,7 +52,7 @@ public class SpaceshipsGetControllerShould extends BaseControllerTest {
 
   @Test
   @WithMockUser(roles = "USER")
-  public void shouldReturnSpaceshipByName() throws Exception {
+  public void get_spaceships_by_name_with_user_with_permissions() throws Exception {
     val nameToFind = "star";
     List<SpaceshipResponse> spaceshipResponseList = TestDataUtil.getSpaceshipsByName(nameToFind)
         .stream()
